@@ -1,14 +1,15 @@
 'use client'
 
-import Button from '@/templates/js/src/components/Button'
-import Input from '@/templates/js/src/components/Input'
-import InputError from '@/templates/js/src/components/InputError'
-import Label from '@/templates/js/src/components/Label'
+import Button from '@/components/Button'
+import Input from '@/components/Input'
+import InputError from '@/components/InputError'
+import Label from '@/components/Label'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
-import { useEffect, useState } from 'react'
+import { FormEventHandler, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
+import { FormError } from '@/types/types'
 
 const Login = () => {
     const router = useRouter()
@@ -21,21 +22,21 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [shouldRemember, setShouldRemember] = useState(false)
-    const [errors, setErrors] = useState([])
-    const [status, setStatus] = useState(null)
+    const [errors, setErrors] = useState<FormError>({})
+    const [status, setStatus] = useState<string | null>(null)
 
     useEffect(() => {
-        if (router.reset?.length > 0 && errors.length === 0) {
+        if (router.reset?.length > 0 && Object.keys(errors).length === 0) {
             setStatus(atob(router.reset))
         } else {
             setStatus(null)
         }
     })
 
-    const submitForm = async event => {
+    const submitForm: FormEventHandler<HTMLFormElement> = async event => {
         event.preventDefault()
 
-        login({
+        await login({
             email,
             password,
             remember: shouldRemember,
