@@ -1,12 +1,13 @@
 'use client'
 
-import Button from '@/templates/js/src/components/Button'
-import Input from '@/templates/js/src/components/Input'
-import InputError from '@/templates/js/src/components/InputError'
-import Label from '@/templates/js/src/components/Label'
-import { useAuth } from '@/templates/js/src/hooks/auth'
-import { useState } from 'react'
-import AuthSessionStatus from '@/templates/js/src/app/(auth)/AuthSessionStatus'
+import Button from '@/components/Button'
+import Input from '@/components/Input'
+import InputError from '@/components/InputError'
+import Label from '@/components/Label'
+import { useAuth } from '@/hooks/auth'
+import { FormEventHandler, useState } from 'react'
+import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
+import { FormError } from '@/types/types'
 
 const Page = () => {
     const { forgotPassword } = useAuth({
@@ -15,13 +16,13 @@ const Page = () => {
     })
 
     const [email, setEmail] = useState('')
-    const [errors, setErrors] = useState([])
-    const [status, setStatus] = useState(null)
+    const [errors, setErrors] = useState<FormError | []>([])
+    const [status, setStatus] = useState<string | null>(null)
 
-    const submitForm = event => {
+    const submitForm: FormEventHandler = async (event) => {
         event.preventDefault()
 
-        forgotPassword({ email, setErrors, setStatus })
+        await forgotPassword({ email, setErrors, setStatus })
     }
 
     return (
