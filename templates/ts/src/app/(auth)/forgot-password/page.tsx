@@ -16,7 +16,7 @@ const Page = () => {
     })
 
     const [email, setEmail] = useState('')
-    const [errors, setErrors] = useState<FormError | []>([])
+    const [errors, setErrors] = useState<FormError>({})
     const [status, setStatus] = useState<string | null>(null)
 
     const submitForm: FormEventHandler = async (event) => {
