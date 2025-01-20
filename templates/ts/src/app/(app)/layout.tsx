@@ -1,8 +1,8 @@
-import Navigation from '@/app/(app)/Navigation'
+import { PropsWithChildren } from 'react'
 import Loading from '@/app/(app)/Loading'
 import { getUserAction } from '@/actions/actions'
+import Navigation from '@/app/(app)/Navigation'
 import UserRefresh from '@/app/(app)/UserRefresh'
-import { PropsWithChildren } from 'react'
 
 const AppLayout = async ({ children }: PropsWithChildren) => {
 
