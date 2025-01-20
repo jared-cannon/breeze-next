@@ -7,12 +7,13 @@ import Label from '@/components/Label'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import { FormEventHandler, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 import { FormError } from '@/types/types'
 
 const Login = () => {
-    const router = useRouter()
+    const searchParams = useSearchParams()
+    const resetParam = searchParams.get('reset')
 
     const { login } = useAuth({
         middleware: 'guest',
@@ -26,12 +27,12 @@ const Login = () => {
     const [status, setStatus] = useState<string | null>(null)
 
     useEffect(() => {
-        if (router.reset?.length > 0 && Object.keys(errors).length === 0) {
-            setStatus(atob(router.reset))
+        if (resetParam && resetParam.length > 0 && Object.keys(errors).length === 0) {
+            setStatus(atob(resetParam))
         } else {
             setStatus(null)
         }
-    })
+    }, [resetParam])
 
     const submitForm: FormEventHandler<HTMLFormElement> = async event => {
         event.preventDefault()
