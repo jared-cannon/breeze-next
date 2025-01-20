@@ -1,12 +1,13 @@
 'use client'
 
-import Button from '@/templates/js/src/components/Button'
-import Input from '@/templates/js/src/components/Input'
-import InputError from '@/templates/js/src/components/InputError'
-import Label from '@/templates/js/src/components/Label'
+import Button from '@/components/Button'
+import Input from '@/components/Input'
+import InputError from '@/components/InputError'
+import Label from '@/components/Label'
 import Link from 'next/link'
-import { useAuth } from '@/templates/js/src/hooks/auth'
-import { useState } from 'react'
+import { useAuth } from '@/hooks/auth'
+import { FormEventHandler, useState } from 'react'
+import { FormError } from '@/types/types'
 
 const Page = () => {
     const { register } = useAuth({
@@ -18,12 +19,12 @@ const Page = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [errors, setErrors] = useState([])
+    const [errors, setErrors] = useState<FormError>({})
 
-    const submitForm = event => {
+    const submitForm: FormEventHandler<HTMLFormElement> = async event => {
         event.preventDefault()
 
-        register({
+        await register({
             name,
             email,
             password,
