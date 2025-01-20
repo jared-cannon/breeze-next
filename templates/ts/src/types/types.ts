@@ -9,7 +9,7 @@ export type User = {
 
 export interface LaravelValidationError {
     message?: string
-    errors?: FormError[]
+    errors?: FormError
 }
 
 export type FormError = {
