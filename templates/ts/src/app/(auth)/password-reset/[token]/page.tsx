@@ -8,17 +8,18 @@ import { useAuth } from '@/templates/js/src/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AuthSessionStatus from '@/templates/js/src/app/(auth)/AuthSessionStatus'
+import { FormError } from '@/types/types'
 
 const PasswordReset = () => {
     const searchParams = useSearchParams()
 
     const { resetPassword } = useAuth({ middleware: 'guest' })
 
-    const [email, setEmail] = useState('')
+    const [email, setEmail] = useState<string | null>('')
     const [password, setPassword] = useState('')
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [errors, setErrors] = useState([])
-    const [status, setStatus] = useState(null)
+    const [errors, setErrors] = useState<FormError | []>([])
+    const [status, setStatus] = useState<string | null>(null)
 
     const submitForm = event => {
         event.preventDefault()
@@ -67,7 +68,7 @@ const PasswordReset = () => {
                         type="password"
                         value={password}
                         className="block mt-1 w-full"
-                        onChange={event => setPassword(event.target.value)}
+                        onChange={(event) => setPassword(event.target.value)}
                         required
                     />
 
