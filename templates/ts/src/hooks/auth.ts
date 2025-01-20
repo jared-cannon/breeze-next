@@ -3,9 +3,9 @@
 import useSWR from 'swr'
 import axios from '@/lib/axios'
 import { Dispatch, SetStateAction, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { FormError, User } from '@/types/types'
-import { AxiosError } from 'axios'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import { FormError, LaravelValidationError, User } from '@/types/types'
+import { AxiosError, AxiosResponse } from 'axios'
 
 interface UseAuthProps {
     middleware?: 'auth' | 'guest'
@@ -14,18 +14,19 @@ interface UseAuthProps {
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = {}) => {
     const router = useRouter()
+    const pathName = usePathname()
     const params = useParams()
 
     const {
         data: user,
         error,
         mutate,
-    } = useSWR<User>('/api/user', () =>
+    } = useSWR<User | void>('/api/user', () =>
         axios
-            .get('/api/user')
+            .get<User>('/api/user')
             .then(res => res.data)
-            .catch(error => {
-                if (error.response.status !== 409) throw error
+            .catch((error: AxiosError) => {
+                if (error.response?.status !== 409) throw error
 
                 router.push('/verify-email')
             }),
@@ -33,20 +34,21 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
-    const register = async ({
-        setErrors,
-        ...props
-    }: {
-        setErrors: Dispatch<SetStateAction<FormError | []>>
-        name: string
-        email: string
-        password: string
-        password_confirmation: string
-        should_remember: boolean
-    }) => {
+    const register = async (
+        {
+            setErrors,
+            ...props
+        }: {
+            setErrors: Dispatch<SetStateAction<FormError>>
+            name: string
+            email: string
+            password: string
+            password_confirmation: string
+        }
+    ) => {
         await csrf()
 
-        setErrors([])
+        setErrors({})
 
         axios
             .post('/register', props)
@@ -56,69 +58,74 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             }>) => {
                 if (error.response?.status !== 422) throw error
 
-                setErrors(error.response?.data?.errors ?? [])
+                setErrors(error.response?.data?.errors ?? {})
             })
     }
 
-    const login = async ({
-        setErrors,
-        setStatus,
-        ...props
-    }: {
-        setErrors: Dispatch<SetStateAction<FormError | []>>
-        setStatus: Dispatch<SetStateAction<string | null>>
-        email: string
-        password: string
-        should_remember: boolean
-    }) => {
+    const login = async (
+        {
+            setErrors,
+            setStatus,
+            ...props
+        }: {
+            setErrors: Dispatch<SetStateAction<FormError>>
+            setStatus: Dispatch<SetStateAction<string | null>>
+            email: string
+            password: string
+            remember: boolean
+        }
+    ) => {
         await csrf()
 
-        setErrors([])
+        setErrors({})
         setStatus(null)
 
         axios
             .post('/login', props)
             .then(() => mutate())
-            .catch((error: AxiosError<{
-                errors?: FormError
-            }>) => {
+            .catch((error: AxiosError<LaravelValidationError>) => {
                 if (error.response?.status !== 422) throw error
 
-                setErrors(error.response?.data?.errors?? [])
+                setErrors(error.response?.data?.errors ?? {})
             })
     }
 
-    const forgotPassword = async ({ setErrors, setStatus, email }: {
-        setErrors: Dispatch<SetStateAction<FormError | []>>
-        setStatus: Dispatch<SetStateAction<string | null>>
-        email: string
-    }) => {
+    const forgotPassword = async (
+        {
+            setErrors,
+            setStatus,
+            email
+        }: {
+            setErrors: Dispatch<SetStateAction<FormError>>
+            setStatus: Dispatch<SetStateAction<string | null>>
+            email: string
+        }
+    ) => {
         await csrf()
 
-        setErrors([])
+        setErrors({})
         setStatus(null)
 
         axios
             .post('/forgot-password', { email })
             .then(response => setStatus(response.data.status))
-            .catch((error: AxiosError<{
-                errors?: FormError
-            }>) => {
+            .catch((error: AxiosError<LaravelValidationError>) => {
                 if (error.response?.status !== 422) throw error
 
-                setErrors(error.response?.data?.errors ?? [])
+                setErrors(error.response?.data?.errors ?? {})
             })
     }
 
     const resetPassword = async ({ setErrors, setStatus, ...props }: {
-        setErrors: Dispatch<SetStateAction<FormError | []>>
+        setErrors: Dispatch<SetStateAction<FormError>>
         setStatus: Dispatch<SetStateAction<string | null>>
+        email: string
         password: string
         password_confirmation: string
     }) => {
         await csrf()
 
-        setErrors([])
+        setErrors({})
         setStatus(null)
 
         axios
@@ -126,14 +133,19 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             .then(response =>
                 router.push('/login?reset=' + btoa(response.data.status)),
             )
-            .catch(error => {
-                if (error.response.status !== 422) throw error
+            .catch((error: AxiosError<LaravelValidationError>) => {
+                if (error.response?.status !== 422) throw error
 
-                setErrors(error.response.data.errors)
+                setErrors(error.response?.data?.errors ?? {})
             })
     }
 
-    const resendEmailVerification = ({ setStatus }) => {
+    const resendEmailVerification = (
+        {
+            setStatus
+        }: {
+            setStatus: Dispatch<SetStateAction<string | null>>
+        }) => {
         axios
             .post('/email/verification-notification')
             .then(response => setStatus(response.data.status))
@@ -144,7 +156,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             await axios.post('/logout').then(() => mutate())
         }
 
-        window.location.pathname = '/login'
+        router.push('/login')
     }
 
     useEffect(() => {
@@ -155,10 +167,13 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             router.push('/verify-email')
 
         if (
-            window.location.pathname === '/verify-email' &&
-            user?.email_verified_at
+            pathName === '/verify-email' &&
+            user &&
+            user?.email_verified_at &&
+            redirectIfAuthenticated
         )
             router.push(redirectIfAuthenticated)
+
         if (middleware === 'auth' && error) logout()
     }, [user, error])
 
