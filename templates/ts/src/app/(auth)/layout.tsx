@@ -1,12 +1,13 @@
 import Link from 'next/link'
-import AuthCard from '@/templates/js/src/app/(auth)/AuthCard'
-import ApplicationLogo from '@/templates/js/src/components/ApplicationLogo'
+import AuthCard from '@/app/(auth)/AuthCard'
+import ApplicationLogo from '@/components/ApplicationLogo'
+import { PropsWithChildren } from 'react'
 
 export const metadata = {
     title: 'Laravel',
 }
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: PropsWithChildren) => {
     return (
         <div>
             <div className="text-gray-900 antialiased">
