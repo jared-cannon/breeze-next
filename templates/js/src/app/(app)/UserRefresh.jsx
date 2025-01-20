@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/hooks/auth'
+import { useAuth } from '@/templates/js/src/hooks/auth'
 
 function UserRefresh() {
 

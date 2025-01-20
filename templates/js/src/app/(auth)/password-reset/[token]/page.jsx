@@ -1,13 +1,13 @@
 'use client'
 
-import Button from '@/components/Button'
-import Input from '@/components/Input'
-import InputError from '@/components/InputError'
-import Label from '@/components/Label'
-import { useAuth } from '@/hooks/auth'
+import Button from '@/templates/js/src/components/Button'
+import Input from '@/templates/js/src/components/Input'
+import InputError from '@/templates/js/src/components/InputError'
+import Label from '@/templates/js/src/components/Label'
+import { useAuth } from '@/templates/js/src/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
+import AuthSessionStatus from '@/templates/js/src/app/(auth)/AuthSessionStatus'
 
 const PasswordReset = () => {
     const searchParams = useSearchParams()

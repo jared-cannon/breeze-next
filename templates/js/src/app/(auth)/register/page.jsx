@@ -1,11 +1,11 @@
 'use client'
 
-import Button from '@/components/Button'
-import Input from '@/components/Input'
-import InputError from '@/components/InputError'
-import Label from '@/components/Label'
+import Button from '@/templates/js/src/components/Button'
+import Input from '@/templates/js/src/components/Input'
+import InputError from '@/templates/js/src/components/InputError'
+import Label from '@/templates/js/src/components/Label'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/auth'
+import { useAuth } from '@/templates/js/src/hooks/auth'
 import { useState } from 'react'
 
 const Page = () => {
