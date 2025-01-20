@@ -1,6 +1,6 @@
 'use server'
 
-import { serverFetch } from '@/templates/js/src/lib/serverFetch'
+import { serverFetch } from '@/lib/serverFetch'
 
 export const getUserAction = async () => {
 
