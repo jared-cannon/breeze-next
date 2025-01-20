@@ -1,4 +1,15 @@
-const AuthSessionStatus = ({ status, className, ...props }) => (
+interface AuthSessionStatusProps {
+    status?: string | null
+    className?: string
+}
+
+const AuthSessionStatus = (
+    {
+        status,
+        className,
+        ...props
+    }: AuthSessionStatusProps
+) => (
     <>
         {status && (
             <div
