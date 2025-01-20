@@ -1,13 +1,13 @@
 'use client'
 
-import Button from '@/templates/js/src/components/Button'
-import Input from '@/templates/js/src/components/Input'
-import InputError from '@/templates/js/src/components/InputError'
-import Label from '@/templates/js/src/components/Label'
-import { useAuth } from '@/templates/js/src/hooks/auth'
-import { useEffect, useState } from 'react'
+import Button from '@/components/Button'
+import Input from '@/components/Input'
+import InputError from '@/components/InputError'
+import Label from '@/components/Label'
+import { useAuth } from '@/hooks/auth'
+import { FormEventHandler, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import AuthSessionStatus from '@/templates/js/src/app/(auth)/AuthSessionStatus'
+import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 import { FormError } from '@/types/types'
 
 const PasswordReset = () => {
@@ -15,16 +15,16 @@ const PasswordReset = () => {
 
     const { resetPassword } = useAuth({ middleware: 'guest' })
 
-    const [email, setEmail] = useState<string | null>('')
+    const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState('')
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [errors, setErrors] = useState<FormError | []>([])
+    const [errors, setErrors] = useState<FormError>({})
     const [status, setStatus] = useState<string | null>(null)
 
-    const submitForm = event => {
+    const submitForm: FormEventHandler<HTMLFormElement> = async event => {
         event.preventDefault()
 
-        resetPassword({
+        await resetPassword({
             email,
             password,
             password_confirmation: passwordConfirmation,
@@ -34,7 +34,7 @@ const PasswordReset = () => {
     }
 
     useEffect(() => {
-        setEmail(searchParams.get('email'))
+        setEmail(searchParams.get('email') || '')
     }, [searchParams.get('email')])
 
     return (
