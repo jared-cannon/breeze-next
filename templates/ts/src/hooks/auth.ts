@@ -5,14 +5,17 @@ import axios from '@/lib/axios'
 import { Dispatch, SetStateAction, useEffect } from 'react'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { FormError, LaravelValidationError, User } from '@/types/types'
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
 
 interface UseAuthProps {
     middleware?: 'auth' | 'guest'
     redirectIfAuthenticated?: string
 }
 
-export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = {}) => {
+export const useAuth = ({
+    middleware,
+    redirectIfAuthenticated,
+}: UseAuthProps = {}) => {
     const router = useRouter()
     const pathName = usePathname()
     const params = useParams()
@@ -34,18 +37,16 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
-    const register = async (
-        {
-            setErrors,
-            ...props
-        }: {
-            setErrors: Dispatch<SetStateAction<FormError>>
-            name: string
-            email: string
-            password: string
-            password_confirmation: string
-        }
-    ) => {
+    const register = async ({
+        setErrors,
+        ...props
+    }: {
+        setErrors: Dispatch<SetStateAction<FormError>>
+        name: string
+        email: string
+        password: string
+        password_confirmation: string
+    }) => {
         await csrf()
 
         setErrors({})
@@ -53,28 +54,24 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
         axios
             .post('/register', props)
             .then(() => mutate())
-            .catch((error: AxiosError<{
-                errors?: FormError
-            }>) => {
+            .catch((error: AxiosError<LaravelValidationError>) => {
                 if (error.response?.status !== 422) throw error
 
                 setErrors(error.response?.data?.errors ?? {})
             })
     }
 
-    const login = async (
-        {
-            setErrors,
-            setStatus,
-            ...props
-        }: {
-            setErrors: Dispatch<SetStateAction<FormError>>
-            setStatus: Dispatch<SetStateAction<string | null>>
-            email: string
-            password: string
-            remember: boolean
-        }
-    ) => {
+    const login = async ({
+        setErrors,
+        setStatus,
+        ...props
+    }: {
+        setErrors: Dispatch<SetStateAction<FormError>>
+        setStatus: Dispatch<SetStateAction<string | null>>
+        email: string
+        password: string
+        remember: boolean
+    }) => {
         await csrf()
 
         setErrors({})
@@ -90,17 +87,15 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             })
     }
 
-    const forgotPassword = async (
-        {
-            setErrors,
-            setStatus,
-            email
-        }: {
-            setErrors: Dispatch<SetStateAction<FormError>>
-            setStatus: Dispatch<SetStateAction<string | null>>
-            email: string
-        }
-    ) => {
+    const forgotPassword = async ({
+        setErrors,
+        setStatus,
+        email,
+    }: {
+        setErrors: Dispatch<SetStateAction<FormError>>
+        setStatus: Dispatch<SetStateAction<string | null>>
+        email: string
+    }) => {
         await csrf()
 
         setErrors({})
@@ -116,7 +111,11 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             })
     }
 
-    const resetPassword = async ({ setErrors, setStatus, ...props }: {
+    const resetPassword = async ({
+        setErrors,
+        setStatus,
+        ...props
+    }: {
         setErrors: Dispatch<SetStateAction<FormError>>
         setStatus: Dispatch<SetStateAction<string | null>>
         email: string
@@ -140,12 +139,11 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = 
             })
     }
 
-    const resendEmailVerification = (
-        {
-            setStatus
-        }: {
-            setStatus: Dispatch<SetStateAction<string | null>>
-        }) => {
+    const resendEmailVerification = ({
+        setStatus,
+    }: {
+        setStatus: Dispatch<SetStateAction<string | null>>
+    }) => {
         axios
             .post('/email/verification-notification')
             .then(response => setStatus(response.data.status))
