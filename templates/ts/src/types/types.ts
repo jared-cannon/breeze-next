@@ -1,11 +1,7 @@
-export type User = {
-    id: number
-    name: string
-    email: string
-    email_verified_at: string | null
-    created_at: string
-    updated_at: string
-}
+import z from 'zod'
+import { UserSchema } from '@/types/schemas'
+
+export type User = z.infer<typeof UserSchema>
 
 export interface LaravelValidationError {
     message?: string
