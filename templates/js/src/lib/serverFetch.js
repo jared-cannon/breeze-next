@@ -25,7 +25,9 @@ export async function serverFetch(route, requestInit = {}) {
         route = route.slice(1)
     }
 
-    return await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/${route}`, options)
+    const url = new URL(route, process.env.NEXT_PUBLIC_BACKEND_URL)
+
+    return await fetch(url, options)
 }
 
 const getHeaders = async () => {
