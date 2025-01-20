@@ -7,6 +7,11 @@ export type User = {
     updated_at: string
 }
 
+export interface LaravelValidationError {
+    message?: string
+    errors?: FormError[]
+}
+
 export type FormError = {
-    [key: string]: string[]
+    [field: string]: string[]
 }
